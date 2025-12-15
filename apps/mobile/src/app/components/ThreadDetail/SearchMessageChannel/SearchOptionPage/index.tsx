@@ -28,7 +28,6 @@ function SearchOptionPage({ searchText, onSelect, optionFilter }: ISeachOptionPa
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const allChannels = useSelector(selectAllChannels);
-	const filteredChannels = useMemo(() => allChannels?.filter((channel) => channel?.type !== ChannelType.CHANNEL_TYPE_APP) || [], [allChannels]);
 
 	const userListData = UseMentionList({
 		channelDetail: currentChannel,
@@ -55,15 +54,16 @@ function SearchOptionPage({ searchText, onSelect, optionFilter }: ISeachOptionPa
 	}, [searchText, userListDataSearchByMention]);
 
 	const searchChannelList = useMemo(() => {
-		if (!searchText) return filteredChannels;
+		const listChannel = allChannels || [];
+		if (!searchText) return listChannel;
 
 		try {
-			return filteredChannels.filter((channel) => (channel?.channel_label ?? '').toLowerCase().includes(searchText.toLowerCase().trim())) || [];
+			return listChannel.filter((channel) => (channel?.channel_label ?? '').toLowerCase().includes(searchText.toLowerCase().trim()));
 		} catch (error) {
 			console.error('Filter search channel list error', error);
 			return [];
 		}
-	}, [searchText, filteredChannels]);
+	}, [searchText, allChannels]);
 
 	const handleSelectChannel = useCallback(
 		(channel: ChannelUsersEntity) => {
